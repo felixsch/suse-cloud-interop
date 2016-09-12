@@ -1,0 +1,113 @@
+heat_template_version: 2014-10-16
+
+description: |
+  Install a basic lamp stack on SUSE Openstack Cloud
+
+parameters:
+  key_name:
+    type: string
+    default: fschnizlein
+
+  flavor:
+    type: string
+    description: Flavor to use for the WordPress server.
+    constraints:
+      - custom_constraint: nova.flavor
+    default: m1.smaller
+
+  image:
+    type: string
+    description: >
+      Name or ID of the image to use for the LAMP server.
+      The image must have the software config agents baked-in.
+
+  private_net:
+    type: string
+    default: cd6f097c-f47b-419e-826f-41985d5d6783
+
+  private_subnet:
+    type: string
+    default: foo
+
+  public_net:
+    type: string
+    default: 958c0b51-d8d6-44e1-9f5e-6d9ee7b78854
+
+
+resources:
+  server_password:
+    type: OS::Heat::RandomString
+
+  lamp:
+    type: OS::Nova::Server
+    properties:
+      key_name: { get_param: key_name }
+      image: { get_param: image }
+      admin_pass: { get_attr: [ server_password, value ] }
+      flavor: { get_param: flavor }
+      #software_config_transport: POLL_TEMP_URL
+      #config_drive: true
+      #user_data_format: SOFTWARE_CONFIG
+      networks:
+        - port: { get_resource: lamp_port }
+
+  lamp_port:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: private_net }
+      #fixed_ips:
+      #  - subnet_id: { get_param: private_subnet }
+      #security_groups: [{ get_resource: server_security_group }]
+
+  lamp_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: { get_param: public_net }
+      port_id: { get_resource: lamp_port }
+
+  # nginx_config:
+  #     type: OS::Heat::SoftwareConfig
+  #     properties:
+  #       group: ansible
+  #       config: |
+  #         ---
+  #         - name: Install and run Nginx
+  #           connection: local
+  #           hosts: localhost
+  #           tasks:
+  #            - name: Install Nginx
+  #              zypper: pkg=nginx state=installed
+  #              notify:
+  #               - Start Nginx
+  #           handlers:
+  #            - name: Start Nginx
+  #              service: name=nginx state=started
+  # deploy_nginx:
+  #   type: OS::Heat::SoftwareDeployment
+  #   properties:
+  #     signal_transport: TEMP_URL_SIGNAL
+  #     config:
+  #       get_resource: nginx_config
+  #     server:
+  #       get_resource: server
+outputs:
+  # stdout:
+  #   description: Ansible Output
+  #   value:
+  #     get_attr: [ deploy_nginx, deploy_stdout ]
+  # stderr:
+  #   description: Ansible Error Output
+  #   value:
+  #     get_attr: [ deploy_nginx, deploy_stderr ]
+  # status_code:
+  #   description: Exit Code
+  #   value:
+  #     get_attr: [ deploy_nginx, deploy_status_code ]
+  server_ip:
+    description: Server IP Address
+    value:
+      get_attr: [ lamp, accessIPv4 ]
+  server_password:
+    description: Server Password
+    value:
+      get_attr: [ server_password, value ]
