@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+#export HEAT_URL="http://dashboard.p1.cloud.suse.de:8004/v1/a50a157358cd48a0b91af18f64ffdb70"
+# export OS_USERNAME="fschnizlein"
+# export OS_AUTH_URL="https://dashboard.p1.cloud.suse.de:5000/v3/"
+# export OS_PROJECT_ID="b0efa7ddc5a143a3988f6e72730228eb"
+# export OS_PROJECT_NAME="suse"
+# export OS_USER_DOMAIN_NAME="Default"
+export OS_USERNAME="crowbar"
+export OS_PASSWORD="crowbar"
+
+export OS_AUTH_URL="http://10.162.188.2:5000/v3/"
+export OS_PROJECT_ID="ed234e1eb1f14258ba0a4b32ffddf1d9"
+export OS_PROJECT_NAME="openstack"
+export OS_USER_DOMAIN_NAME="Default"
+
+bash
+

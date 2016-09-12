@@ -47,7 +47,7 @@ resources:
       flavor: { get_param: flavor }
       #software_config_transport: POLL_TEMP_URL
       #config_drive: true
-      #user_data_format: SOFTWARE_CONFIG
+      user_data_format: SOFTWARE_CONFIG
       networks:
         - port: { get_resource: lamp_port }
 
@@ -55,9 +55,6 @@ resources:
     type: OS::Neutron::Port
     properties:
       network_id: { get_param: private_net }
-      #fixed_ips:
-      #  - subnet_id: { get_param: private_subnet }
-      #security_groups: [{ get_resource: server_security_group }]
 
   lamp_floating_ip:
     type: OS::Neutron::FloatingIP
@@ -65,48 +62,27 @@ resources:
       floating_network_id: { get_param: public_net }
       port_id: { get_resource: lamp_port }
 
-  # nginx_config:
-  #     type: OS::Heat::SoftwareConfig
-  #     properties:
-  #       group: ansible
-  #       config: |
-  #         ---
-  #         - name: Install and run Nginx
-  #           connection: local
-  #           hosts: localhost
-  #           tasks:
-  #            - name: Install Nginx
-  #              zypper: pkg=nginx state=installed
-  #              notify:
-  #               - Start Nginx
-  #           handlers:
-  #            - name: Start Nginx
-  #              service: name=nginx state=started
-  # deploy_nginx:
-  #   type: OS::Heat::SoftwareDeployment
-  #   properties:
-  #     signal_transport: TEMP_URL_SIGNAL
-  #     config:
-  #       get_resource: nginx_config
-  #     server:
-  #       get_resource: server
+# ---- ANSIBLE DEFINITIONS --------------------------------------
+  nginx:
+      type: OS::Heat::SoftwareConfig
+      properties:
+        group: script
+        config: |
+          #!/usr/bin/env bash
+          touch /foo
+        outputs:
+          - name: result
+
+  deploy_nginx:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: nginx
+      server:
+        get_resource: lamp
+
+# ---- OUTPUTS --------------------------------------------------
 outputs:
-  # stdout:
-  #   description: Ansible Output
-  #   value:
-  #     get_attr: [ deploy_nginx, deploy_stdout ]
-  # stderr:
-  #   description: Ansible Error Output
-  #   value:
-  #     get_attr: [ deploy_nginx, deploy_stderr ]
-  # status_code:
-  #   description: Exit Code
-  #   value:
-  #     get_attr: [ deploy_nginx, deploy_status_code ]
-  server_ip:
-    description: Server IP Address
-    value:
-      get_attr: [ lamp, accessIPv4 ]
   server_password:
     description: Server Password
     value:
