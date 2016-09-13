@@ -1,0 +1,9 @@
+---
+- name: Install required packages
+  zypper:
+    name="{{ item }}"
+    state=latest
+  with_items:
+    apache2
+    php7
+    php7-mysql

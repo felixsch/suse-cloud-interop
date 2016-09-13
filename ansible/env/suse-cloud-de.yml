@@ -1,0 +1,12 @@
+---
+auth:
+  auth_url: "https://dashboard.p1.cloud.suse.de:5000/v3/"
+  username: "{{ username }}"
+  password: "{{ password }}"
+  project_name: "suse"
+  domain_name: "Default"
+
+env:
+  flavor_name: "m1.smaller"
+  image_name: "SLES12-SP1"
+  private_net_name: "fixed"
