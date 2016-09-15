@@ -1,5 +1,5 @@
 *terraform.tfstate*
-terraform/inventory
+inventory
 *.vars
 envs/*
 !envs/example.cloud
