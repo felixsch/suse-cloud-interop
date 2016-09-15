@@ -1,0 +1,21 @@
+---
+
+- name: Add php repository
+  shell: zypper --non-interactive ar http://download.opensuse.org/repositories/devel:/languages:/php/SLE_12/devel:languages:php.repo || true
+
+- name: Refresh php repository
+  shell: zypper --no-gpg-checks ref
+
+- name: Install required packages
+  zypper:
+    name="{{ item }}"
+    state=latest
+  with_items:
+  - apache2
+  - php7
+  - php7-mysql
+  - php7-gd
+
+- name: Enable apache
+  service: name=apache2 enabled=yes state=started
+

@@ -1,0 +1,37 @@
+---
+- name: Install required packages
+  zypper: name="{{ item }}" state=latest
+  with_items:
+  - mariadb
+  - mariadb-tools
+  - python-mysql
+
+- name: Enable database
+  service: name=mysql enabled=yes state=started
+
+- name: Set up database
+  command: "{{ item }}"
+  with_items:
+    - mysql -e "UPDATE mysql.user SET Password = PASSWORD('{{ db.root_password }}') WHERE User = 'root'"
+    - mysql -e "DROP USER ''@'localhost'"
+    - mysql -e "DROP DATABASE test"
+    - mysql -e "FLUSH PRIVILEGES"
+
+- name: Add database
+  mysql_db:
+    name: "{{ db.name }}"
+    login_user: "root"
+    login_password: "{{ db.root_password }}"
+    state: present
+
+- name: Add database user
+  mysql_user:
+    name: "{{ db.user }}"
+    password: "{{ db.password }}"
+    host: "%"
+    priv: "{{ db.name }}.*:ALL"
+    login_user: "root"
+    login_password: "{{ db.root_password }}"
+    state: present
+
+

@@ -1,0 +1,38 @@
+---
+
+- name: Wait for hosts
+  hosts: basic-setup
+  gather_facts: False
+  tasks:
+    - name: "Wait for hosts to come up"
+      local_action: wait_for port=22 host="{{ inventory_hostname }}" delay=10
+      when: need_wait is defined
+
+    - name: "Let the ssh daemon catch up"
+      pause: seconds=15
+      when: need_wait is defined
+
+- name: Setup basic commands
+  hosts: basic-setup
+  remote_user: root
+  tasks:
+    - name: Refresh repository
+      shell: zypper --no-gpg-checks ref
+
+
+- name: Install webservers
+  hosts: webserver
+  remote_user: root
+  roles:
+    - webserver
+
+- name: Install database server
+  hosts: database
+  remote_user: root
+  vars_files:
+    - "database/ansible.vars"
+  roles:
+    - database
+
+
+
