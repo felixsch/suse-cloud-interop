@@ -1,0 +1,30 @@
+
+# Setup your openstack credentials
+export OS_USERNAME="username"
+export OS_AUTH_URL="https://url.to.auth.server"
+export OS_PROJECT_DOMAIN_NAME="domain name"
+export OS_PROJECT_NAME="project"
+export OS_DOMAIN_NAME="domain name"
+export OS_TENANT_NAME="tenant name (same as project name)"
+export OS_IDENTITY_API_VERSION=3
+
+# openstack image name
+LAMP_IMAGE_NAME="SLES12-SP1"
+
+# openstack flavor name
+LAMP_FLAVOR_NAME="m1.smaller"
+
+# How many webservers to you need?
+LAMP_WEBSERVER_COUNT=3
+
+# Key file or default ${HOME}/.ssh/id_rsa.pub"
+#LAMP_SSH_KEY_FILE="${HOME}/.ssh/id_ecdsa.pub"
+
+# Database root password
+LAMP_DB_ROOT_PASSWORD="root"
+
+# User to run wordpress
+LAMP_DB_USER="wordpress"
+
+# Password of wordpress user
+LAMP_DB_PASSWORD="wordpress"
