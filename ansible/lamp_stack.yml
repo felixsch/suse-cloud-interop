@@ -1,8 +1,0 @@
----
-- name: run specified command
-  hosts: cloud
-  connection: local
-  vars_files:
-    - "env/{{ lamp_env }}.yml"
-  roles:
-    - "{{ action }}"
