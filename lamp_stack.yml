@@ -26,6 +26,12 @@
   roles:
     - webserver
 
+- name: Install balancer
+  hosts: balancer
+  remote_user: root
+  roles:
+    - balancer
+
 - name: Install database server
   hosts: database
   remote_user: root
@@ -33,6 +39,13 @@
     - "database/ansible.vars"
   roles:
     - database
+
+- name: Install wordpress
+  hosts: webserver
+  remote_user: root
+  roles:
+    - wordpress
+
 
 
 

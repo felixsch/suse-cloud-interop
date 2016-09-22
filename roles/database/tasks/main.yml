@@ -6,6 +6,7 @@
   - mariadb-tools
   - python-mysql
 
+
 - name: Enable database
   service: name=mysql enabled=yes state=started
 
@@ -16,6 +17,20 @@
     - mysql -e "DROP USER ''@'localhost'"
     - mysql -e "DROP DATABASE test"
     - mysql -e "FLUSH PRIVILEGES"
+
+- name: Allow remote connections
+  lineinfile:
+    dest: "/etc/mysql/my.cnf"
+    regex: '^(skip-networking.*)'
+    line: '# \1'
+    backrefs: yes
+    state: present
+  lineinfile:
+    dest: "/etc/mysql/my.cnf"
+    regex: '^(bind-address.*)'
+    line: '# \1'
+    backrefs: yes
+    state: present
 
 - name: Add database
   mysql_db:

@@ -18,7 +18,7 @@ function lamp_load_configuration() {
 
   # define default values
   LAMP_SSH_KEY_FILE=${LAMP_SSH_KEY_FILE:-${HOME}/.ssh/id_rsa.pub}
-  LAMP_APACHE_COUNT=${LAMP_APACHE_COUNT:-1}
+  LAMP_WEBSERVER_COUNT=${LAMP_WEBSERVER_COUNT:-1}
   LAMP_DB_ROOT_PASSWORD=${LAMP_DB_ROOT_PASSWORD:-root}
   LAMP_DB_USER=${LAMP_DB_USER:-lamp}
   LAMP_DB_PASSWORD=${LAMP_DB_PASSWORD:-lamp}
@@ -29,7 +29,7 @@ function lamp_load_configuration() {
   LAMP_PUBKEY=$(cat ${LAMP_SSH_KEY_FILE})
 
   # export terraform variables
-  export TF_VAR_apache_count=${LAMP_APACHE_COUNT}
+  export TF_VAR_webserver_count=${LAMP_APACHE_COUNT}
   export TF_VAR_image_name=${LAMP_IMAGE_NAME}
   export TF_VAR_flavor_name=${LAMP_FLAVOR_NAME}
   export TF_VAR_public_key="${LAMP_PUBKEY}"
@@ -38,7 +38,7 @@ function lamp_load_configuration() {
 function lamp_generate_inventory_file() {
   # create inventory file
   echo "[basic-setup]" > inventory
-  for ip in ${LAMP_WEBSERVER_IPS} ${LAMP_DATABASE_IP}; do
+  for ip in ${LAMP_WEBSERVER_IPS} ${LAMP_DATABASE_IP} ${LAMP_BALANCER_IP}; do
     echo "$ip" >> inventory
   done
   echo "[webserver]" >> inventory
@@ -47,6 +47,8 @@ function lamp_generate_inventory_file() {
   done
   echo "[database]" >> inventory
   echo "${LAMP_DATABASE_IP}" >> inventory
+  echo "[balancer]" >> inventory
+  echo "${LAMP_BALANCER_IP}" >> inventory
 }
 
 function lamp_generate_database_vars() {
@@ -62,10 +64,16 @@ EOF
 function lamp_start() {
   echo "starting lamp stack.."
 
-  # spawning apache servers
+  # spawning webservers
   pushd webserver > /dev/null
   terraform apply
   export LAMP_WEBSERVER_IPS=$(terraform output ip)
+  popd
+
+  # spawn database server
+  pushd balancer > /dev/null
+  terraform apply
+  export LAMP_BALANCER_IP=$(terraform output ip)
   popd
 
   # spawn database server
@@ -79,7 +87,7 @@ function lamp_start() {
   lamp_generate_database_vars
 
   echo "run ansible..."
-  ansible-playbook -i inventory lamp_stack.yml
+  ansible-playbook -e"need_wait=true" -i inventory lamp_stack.yml
 }
 
 
@@ -88,12 +96,14 @@ function lamp_destroy() {
 
   pushd database > /dev/null
   terraform destroy -force
-  rm terraform.tfstate*
+  popd
+
+  pushd balancer > /dev/null
+  terraform destroy -force
   popd
 
   pushd webserver > /dev/null
   terraform destroy -force
-  rm terraform.tfstate*
   popd
 
   rm inventory

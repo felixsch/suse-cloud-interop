@@ -1,0 +1,13 @@
+upstream lamp {
+{% for host in groups['webserver'] %}
+    server {{ hostvars[host]['ansible_eth0']['ipv4']['address'] }};
+{% endfor %}
+}
+
+server {
+  listen 80;
+
+  location / {
+    proxy_pass http://lamp;
+  }
+}

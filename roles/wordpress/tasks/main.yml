@@ -1,0 +1,30 @@
+---
+- name: Creates share directory for wpcontent
+  file:
+    path: /var/www/html/wp-content/uploads
+    state: directory
+    owner: root
+    group: www
+
+- name: Download wordpress
+  get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: /var/www/latest.tar.gz
+
+- name: Unpack latest wordpress
+  shell: tar -xf /var/www/latest.tar.gz -C /var/www/html --strip-components=1
+  args:
+    warn: no
+
+- name: Configure wordpress database, username and password
+  replace:
+    dest: /var/www/html/wp-config.php
+    regexp: "'{{ item.then }}'"
+    replace: "'{{ item.now }}'"
+    backup: no
+  with_items:
+    - { then: 'database_name_here', now: "{{ db.name }}" }
+    - { then: 'username_here', now: "{{ db.user }}" }
+    - { then: 'password_here', now: "{{ db.password }}" }
+
+
