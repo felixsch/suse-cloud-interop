@@ -17,14 +17,15 @@
   - php5-gd
   - apache2-mod_php5
 
+- name: Enable php5 apache module
+  apache2_module: state=present name=php5
+
 - name: Add index.php to DirectoryIndex
   lineinfile:
     dest: /etc/apache2/httpd.conf
     regexp: ^DirectoryIndex
-    insertafter: ^DirectoryIndex
-    line: " index.php "
-
+    line: "DirectoryIndex index.html index.html.var index.php"
 
 - name: Enable apache
-  service: name=apache2 enabled=yes state=started
+  service: name=apache2 enabled=yes state=restarted
 

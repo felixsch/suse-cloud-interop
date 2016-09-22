@@ -16,7 +16,7 @@
   file: path="/etc/nginx/vhosts.d" state=directory
 
 - name: Setup nginx
-  template: src=lamp.j2 dest=/etc/nginx/vhosts.d/lamp.conf owner=root
+  template: src=nginx.j2 dest=/etc/nginx/nginx.conf owner=root
 
 - name: Start nginx
   service: name=nginx enabled=true state=started

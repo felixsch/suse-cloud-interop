@@ -10,13 +10,16 @@
 - name: Enable database
   service: name=mysql enabled=yes state=started
 
-# - name: Set up database
-#   command: "{{ item }}"
-#   with_items:
-#     - mysql -e "UPDATE mysql.user SET Password = PASSWORD('{{ db.root_password }}') WHERE User = 'root'"
-#     - mysql -e "DROP USER ''@'localhost'"
-#     - mysql -e "DROP DATABASE test"
-#     - mysql -e "FLUSH PRIVILEGES"
+- name: Set up database
+  command: "{{ item }}"
+  with_items:
+    - mysql -e "UPDATE mysql.user SET Password = PASSWORD('{{ db.root_password }}') WHERE User = 'root'"
+    - mysql -e "DROP USER ''@'localhost'"
+    - mysql -e "DROP DATABASE test"
+    - mysql -e "FLUSH PRIVILEGES"
+
+- name: Restart mysql
+  service: name=mysql state=restarted
 
 - name: Allow remote connections
   lineinfile:
