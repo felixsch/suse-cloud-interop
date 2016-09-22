@@ -29,7 +29,7 @@ function lamp_load_configuration() {
   LAMP_PUBKEY=$(cat ${LAMP_SSH_KEY_FILE})
 
   # export terraform variables
-  export TF_VAR_webserver_count=${LAMP_APACHE_COUNT}
+  export TF_VAR_webserver_count=${LAMP_WEBSERVER_COUNT}
   export TF_VAR_image_name=${LAMP_IMAGE_NAME}
   export TF_VAR_flavor_name=${LAMP_FLAVOR_NAME}
   export TF_VAR_public_key="${LAMP_PUBKEY}"
@@ -52,7 +52,7 @@ function lamp_generate_inventory_file() {
 }
 
 function lamp_generate_database_vars() {
-  cat >database/ansible.vars <<EOF
+  cat >ansible.vars <<EOF
 db:
    root_password: ${LAMP_DB_ROOT_PASSWORD}
    user: ${LAMP_DB_USER}

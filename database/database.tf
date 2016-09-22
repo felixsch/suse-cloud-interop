@@ -35,7 +35,7 @@ resource "openstack_compute_instance_v2" "mysql" {
     image_name = "${var.image_name}"
     flavor_name = "${var.flavor_name}"
     key_pair = "interop-mysql-key"
-    security_groups = ["default"]
+    security_groups = ["interop"]
     network {
         access_network = true
         name = "fixed"

@@ -30,12 +30,11 @@ resource "openstack_compute_floatingip_v2" "balancer_floating" {
 }
 
 resource "openstack_compute_instance_v2" "balancer" {
-    region = ""
     name = "interop-balancer-1"
     image_name = "${var.image_name}"
     flavor_name = "${var.flavor_name}"
     key_pair = "interop-balancer-key"
-    security_groups = ["default"]
+    security_groups = ["interop"]
 
     network {
         access_network = true

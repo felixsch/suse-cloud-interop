@@ -10,27 +10,29 @@
 - name: Enable database
   service: name=mysql enabled=yes state=started
 
-- name: Set up database
-  command: "{{ item }}"
-  with_items:
-    - mysql -e "UPDATE mysql.user SET Password = PASSWORD('{{ db.root_password }}') WHERE User = 'root'"
-    - mysql -e "DROP USER ''@'localhost'"
-    - mysql -e "DROP DATABASE test"
-    - mysql -e "FLUSH PRIVILEGES"
+# - name: Set up database
+#   command: "{{ item }}"
+#   with_items:
+#     - mysql -e "UPDATE mysql.user SET Password = PASSWORD('{{ db.root_password }}') WHERE User = 'root'"
+#     - mysql -e "DROP USER ''@'localhost'"
+#     - mysql -e "DROP DATABASE test"
+#     - mysql -e "FLUSH PRIVILEGES"
 
 - name: Allow remote connections
   lineinfile:
-    dest: "/etc/mysql/my.cnf"
-    regex: '^(skip-networking.*)'
+    dest: "/etc/my.cnf"
+    regexp: '^(skip-networking.*)'
     line: '# \1'
     backrefs: yes
     state: present
   lineinfile:
-    dest: "/etc/mysql/my.cnf"
-    regex: '^(bind-address.*)'
+    dest: "/etc/my.cnf"
+    regexp: '^(bind-address.*)'
     line: '# \1'
     backrefs: yes
     state: present
+  notify:
+    - restart mysql
 
 - name: Add database
   mysql_db:

@@ -12,9 +12,18 @@
     state=latest
   with_items:
   - apache2
-  - php7
-  - php7-mysql
-  - php7-gd
+  - php5
+  - php5-mysql
+  - php5-gd
+  - apache2-mod_php5
+
+- name: Add index.php to DirectoryIndex
+  lineinfile:
+    dest: /etc/apache2/httpd.conf
+    regexp: ^DirectoryIndex
+    insertafter: ^DirectoryIndex
+    line: " index.php "
+
 
 - name: Enable apache
   service: name=apache2 enabled=yes state=started

@@ -36,22 +36,28 @@ resource "openstack_compute_floatingip_v2" "webserver_floating" {
   pool = "floating"
 }
 
-/* resource "openstack_compute_secgroup_v2" "lamp_security_group" { */
-/*   name = "interop" */
-/*   description = "Interop challange security group" */
-/*   rule { */
-/*     from_port = 22 */
-/*     to_port = 22 */
-/*     ip_protocol = "tcp" */
-/*     cidr = "0.0.0.0/0" */
-/*   } */
-/*   rule { */
-/*     from_port = 80 */
-/*     to_port = 80 */
-/*     ip_protocol = "tcp" */
-/*     cidr = "0.0.0.0/0" */
-/*   } */
-/* } */
+resource "openstack_compute_secgroup_v2" "lamp_security_group" {
+  name = "interop"
+  description = "Interop challange security group"
+  rule {
+    from_port = 22
+    to_port = 22
+    ip_protocol = "tcp"
+    cidr = "0.0.0.0/0"
+  }
+  rule {
+    from_port = 80
+    to_port = 80
+    ip_protocol = "tcp"
+    cidr = "0.0.0.0/0"
+  }
+  rule {
+    from_port = 3306
+    to_port = 3306
+    ip_protocol = "tcp"
+    cidr = "0.0.0.0/0"
+  }
+}
 
 resource "openstack_compute_instance_v2" "webserver" {
     region = ""
@@ -60,7 +66,7 @@ resource "openstack_compute_instance_v2" "webserver" {
     image_name = "${var.image_name}"
     flavor_name = "${var.flavor_name}"
     key_pair = "interop-webserver-key"
-    security_groups = ["default"]
+    security_groups = ["interop"]
 
     network {
         access_network = true

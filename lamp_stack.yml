@@ -36,7 +36,7 @@
   hosts: database
   remote_user: root
   vars_files:
-    - "database/ansible.vars"
+    - "ansible.vars"
   roles:
     - database
 
@@ -45,6 +45,8 @@
   remote_user: root
   roles:
     - wordpress
+  vars_files:
+    - "ansible.vars"
 
 
 
